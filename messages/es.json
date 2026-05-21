@@ -1,0 +1,261 @@
+{
+  "Navigation": {
+    "home": "Inicio",
+    "activities": "Actividades",
+    "amenities": "Nuestro Oasis",
+    "gallery": "Galería",
+    "reviews": "Opiniones",
+    "contact": "Contacto",
+    "about": "Nosotros"
+  },
+  "Hero": {
+    "title": "Bienvenido a Nuestro Oasis del Desierto",
+    "subtitle": "Land of Sand and Adventures – El Resort definitivo de Quads y Buggy en las dunas de Agadir Takadt.",
+    "book_now": "Reserva tu Aventura",
+    "whatsapp": "Contacto WhatsApp"
+  },
+  "Highlights": {
+    "gopro_title": "¡Video GoPro y Edición Gratis! 🎥",
+    "gopro_desc": "¡Deja tu teléfono en el bolsillo y concéntrate al 100% en la adrenalina! Nuestros guías profesionales grabarán tus mejores momentos. En 3 días te enviaremos un vídeo profesional editado con música, listo para Instagram o TikTok.",
+    "airport_title": "¿Aterrizas en el Aeropuerto de Agadir? ¡Comienza tu Aventura al Instante!",
+    "airport_desc": "Te recogemos directamente en el Aeropuerto (a 25 min), guardamos tu equipaje 100% seguro en nuestra base, conduces y luego te dejamos en tu hotel. ¡Sin perder tiempo!"
+  },
+  "Activities": {
+    "section_title": "Nuestras",
+    "section_highlight": "Aventuras",
+    "section_subtitle": "Experimenta la máxima emoción en nuestras dunas privadas.",
+    "duration": "Duración: {time}",
+    "book_now": "Reservar",
+    "whatsapp": "Preguntar por WhatsApp",
+    "schedule_label": "Horario:",
+    "suitable_label": "Ideal para:",
+    "includes_label": "Qué Incluye:",
+    "tour1": {
+      "title": "Tour en Quad",
+      "subtitle": "Dunas y Off-Road",
+      "description": "Paseo épico por las auténticas dunas de Agadir Takadt en un potente Quad.",
+      "schedule": "Disponible todos los días",
+      "suitable": "Todos los niveles",
+      "includes": [
+        "Guía Profesional",
+        "Video GoPro",
+        "Pausa de Té",
+        "Recogida gratuita en el hotel (Zona turística de Agadir)"
+      ],
+      "price": "$25"
+    },
+    "tour2": {
+      "title": "Tour en Buggy",
+      "subtitle": "Dunes & Off-Road",
+      "description": "Experimenta la emoción de las dunas en nuestros Buggies premium de dos plazas.",
+      "schedule": "Disponible todos los días",
+      "suitable": "Familias y amigos",
+      "includes": [
+        "Guía Profesional",
+        "Video GoPro",
+        "Pausa de Té",
+        "Recogida gratuita en el hotel (Zona turística de Agadir)"
+      ],
+      "price": "$50"
+    },
+    "tour3": {
+      "title": "Noches Marroquíes y Cenas Gnawa",
+      "subtitle": "Experiencia Cultural",
+      "description": "Cenas tradicionales bajo carpas saharianas con músicos Gnawa en vivo.",
+      "schedule": "Por la noche",
+      "suitable": "Parejas, Familias",
+      "includes": [
+        "Cena",
+        "Música en Vivo",
+        "Ambiente del Desierto",
+        "Recogida gratuita en el hotel (Zona turística de Agadir)"
+      ],
+      "price": ""
+    },
+    "tour4": {
+      "title": "Alojamiento Nocturno",
+      "subtitle": "Solo para Familias",
+      "description": "Hermosas habitaciones privadas en el desierto, reservadas estrictamente para familias.",
+      "schedule": "Una noche",
+      "suitable": "Solo familias",
+      "includes": [
+        "Habitación Privada",
+        "Cena y Desayuno",
+        "Amanecer en el Desierto",
+        "Recogida gratuita en el hotel (Zona turística de Agadir)"
+      ],
+      "price": ""
+    },
+    "tour5": {
+      "title": "Excursión de día completo de Takadt a Massa",
+      "subtitle": "Expedición de élite",
+      "description": "Una aventura inolvidable de día completo que comienza con los preparativos de la mañana a las 10 a.m. y concluye a las 5 p.m. Explora la impresionante ruta de Takadt a Massa.",
+      "schedule": "10:00 - 17:00",
+      "suitable": "Amantes de la aventura",
+      "includes": [
+        "Comida Incluida",
+        "Grabación Profesional",
+        "Recogida gratuita en el hotel (Zona turística de Agadir)"
+      ],
+      "price": ""
+    },
+    "coming_soon": "Próximamente"
+  },
+  "About": {
+    "about_title": "Más que una Tienda de Alquiler – Bienvenido a Nuestro Oasis",
+    "about_subtitle": "Un Parque de Aventuras Premium",
+    "about_desc1": "Land of Sand Resort es un enorme parque de aventuras y oasis en Agadir Takadt. El campamento base en sí mismo es una gran parte de la experiencia.",
+    "about_desc2": "No somos un simple garaje; somos una base totalmente equipada con comedor tradicional, hermosas áreas de descanso y una atmósfera inmersiva del Sahara.",
+    "reserve_btn": "Reservar en WhatsApp",
+    "highlight_btn": "Comienza tu Aventura"
+  },
+  "WhyUs": {
+    "title": "Instalaciones y",
+    "title_highlight": "Comodidades",
+    "subtitle": "Nuestro campamento base premium ofrece todo lo que necesitas.",
+    "coming_soon": "Próximamente: Nuestra Piscina en el Desierto 🏊‍♂️",
+    "values": [
+      {
+        "title": "Campamento Base Sahariano",
+        "desc": "Tiendas nómadas, áreas de descanso y zona de juegos segura para niños."
+      },
+      {
+        "title": "Duchas y Vestuarios",
+        "desc": "Duchas limpias y vestuarios privados para guardar pertenencias."
+      },
+      {
+        "title": "Limpieza de Polvo y Equipo",
+        "desc": "Sopladores de polvo profesionales, vehículos nuevos y fundas higiénicas."
+      },
+      {
+        "title": "Parking Gratuito y Seguro",
+        "desc": "Aparcamiento amplio y gratuito para huéspedes con coche de alquiler."
+      },
+      {
+        "title": "Accesible y Pet Friendly",
+        "desc": "Totalmente accesible para sillas de ruedas y admite mascotas al 100%."
+      },
+      {
+        "title": "Té de Menta Gratis",
+        "desc": "Té tradicional gratuito para cada huésped y expertos en turismo local."
+      }
+    ]
+  },
+  "Gallery": {
+    "title": "Galería de",
+    "title_highlight": "Aventuras",
+    "subtitle": "Turistas reales, campamento real, paisajes reales.",
+    "view": "Ver Imagen"
+  },
+  "Reviews": {
+    "title": "Valorados 4.9/5 en",
+    "title_highlight": "Google Maps",
+    "subtitle": "(con más de 120 opiniones reales)",
+    "google_button": "Lee Nuestras Opiniones en Google Maps",
+    "reviews": [
+      {
+        "name": "Sarah Jenkins",
+        "date": "hace 2 semanas",
+        "text": "¡Imprescindible en Agadir! El paseo en quad por las dunas fue emocionante."
+      },
+      {
+        "name": "David Martinez",
+        "date": "hace 1 mes",
+        "text": "Experiencia premium de principio a fin. Reservamos el tour en buggy y superó todas las expectativas."
+      },
+      {
+        "name": "Emma Thompson",
+        "date": "hace 3 meses",
+        "text": "La noche Gnawa fue mágica. Comida increíble y música genial."
+      },
+      {
+        "name": "Lucas Dubois",
+        "date": "hace 4 meses",
+        "text": "La mejor experiencia off-road. El equipo es nuevo y los guías excelentes."
+      },
+      {
+        "name": "Chloe Smith",
+        "date": "hace 2 meses",
+        "text": "¡Increíble aventura familiar! El vídeo GoPro gratuito es genial."
+      }
+    ]
+  },
+  "Reservation": {
+    "title": "Reserva tu",
+    "title_highlight": "Aventura",
+    "subtitle": "Reserva ultra sencilla. Paga a la llegada.",
+    "name": "Nombre Completo",
+    "date": "Fecha de la Aventura",
+    "activities_selected": "Actividades",
+    "persons": "Número de Personas",
+    "confirm": "Enviar por WhatsApp",
+    "no_card": "🟢 Reserva en WhatsApp - Sin Tarjeta (Pago a la Llegada)",
+    "free_pickup": "🟢 Transporte Gratuito Incluido (Agadir y Taghazout)",
+    "cancellation": "Cancelación Gratuita: Cancela o reprograma gratis hasta 24h antes.",
+    "safety": "Formación de Seguridad: Sesión informativa y prueba antes de la salida.",
+    "quad_tour": "Tour en Quad",
+    "buggy_tour": "Tour en Buggy",
+    "moroccan_nights": "Noches Marroquíes y Cenas Gnawa",
+    "overnight_stays": "Alojamiento Nocturno (Solo Familias)",
+    "massa_offroad": "Excursión de día completo de Takadt a Massa",
+    "addons_label": "Complementos (En las dunas):",
+    "addon_camel": "Paseo en Camello (+$5)",
+    "addon_sandboard": "Sandboard (+$4)",
+    "quad_buggy_mix": "Quad y Buggy (Mixto)",
+    "num_quads": "Número de Quads",
+    "num_buggies": "Número de Buggies",
+    "quads_count": "Quads",
+    "buggies_count": "Buggies"
+  },
+  "Footer": {
+    "map_title": "Encuentra Nuestro Oasis en Agadir Takadt"
+  },
+  "FAQ": {
+    "title": "Preguntas",
+    "title_highlight": "Frecuentes",
+    "subtitle": "Todo lo que necesitas saber.",
+    "items": [
+      {
+        "q": "¿Necesito carnet de conducir?",
+        "a": "No, los vehículos son automáticos y muy fáciles de manejar."
+      },
+      {
+        "q": "¿Qué ropa debo llevar?",
+        "a": "Ropa cómoda y calzado cerrado (obligatorio)."
+      },
+      {
+        "q": "¿Pueden ir niños?",
+        "a": "Sí, a partir de 6 años como pasajeros."
+      },
+      {
+        "q": "¿Está incluido el transporte?",
+        "a": "Sí, ofrecemos recogida gratuita en Agadir."
+      },
+      {
+        "q": "¿Puedo llevar mi teléfono?",
+        "a": "Sí para fotos en las paradas, pero no al conducir."
+      }
+    ]
+  },
+  "Contact": {
+    "title": "Ponte en",
+    "title_highlight": "Contacto",
+    "subtitle": "¿Listo para la aventura? ¡Envíanos un mensaje!",
+    "name": "Nombre",
+    "email": "Email",
+    "phone": "Teléfono",
+    "message": "Mensaje",
+    "send": "Enviar",
+    "sending": "Enviando...",
+    "success": "¡Mensaje enviado!",
+    "error": "Error al enviar.",
+    "info_title": "Información",
+    "info_desc": "Disponibles 24/7."
+  },
+  "CTA": {
+    "title": "¿Listo para tu Aventura?",
+    "subtitle": "Únete a nosotros para una experiencia inolvidable.",
+    "book": "Reservar",
+    "whatsapp": "Contacto WhatsApp"
+  }
+}
