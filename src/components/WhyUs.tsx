@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Compass, Key, ShieldCheck, Camera, Gift, Star } from "lucide-react";
+import { Compass, Key, ShieldCheck, Camera, Gift, Star, Waves } from "lucide-react";
 
 export default function WhyUs() {
   const t = useTranslations("WhyUs");
@@ -13,7 +13,8 @@ export default function WhyUs() {
     <ShieldCheck key="shield" className="w-8 h-8 text-amber-500" />,
     <Camera key="camera" className="w-8 h-8 text-amber-500" />,
     <Gift key="gift" className="w-8 h-8 text-amber-500" />,
-    <Star key="star" className="w-8 h-8 text-amber-500" />
+    <Star key="star" className="w-8 h-8 text-amber-500" />,
+    <Waves key="waves" className="w-8 h-8 text-blue-500 group-hover:text-cyan-400 transition-colors duration-500 animate-pulse" />
   ];
 
   return (
@@ -41,31 +42,45 @@ export default function WhyUs() {
           <div className="w-24 h-1 bg-gradient-to-r from-amber-600 to-amber-400 mx-auto rounded-full"></div>
         </div>
 
-        {/* Coming Soon Teaser */}
-        <div className="max-w-3xl mx-auto mb-16 relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-          <div className="relative bg-slate-900 border border-slate-700 p-6 rounded-2xl flex items-center justify-center shadow-2xl">
-            <h3 className="text-2xl md:text-3xl font-bold text-white tracking-wide">
-              {t("coming_soon")}
-            </h3>
-          </div>
-        </div>
-
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {t.raw("values").map((feature: { title: string, desc: string }, idx: number) => {
-            // Make the first card span 2 columns on large screens for a pro bento box look
-            const isFeatured = idx === 0;
+            // Make the first card and the swimming pool card span 2 columns on large screens for a balanced Bento framing
+            const isFeatured = idx === 0 || idx === 6;
+            const isPool = idx === 6;
+
             return (
               <div 
                 key={idx} 
-                className={`group relative bg-slate-800/50 hover:bg-slate-800 backdrop-blur-md border border-slate-700/50 hover:border-amber-500/30 rounded-3xl p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(217,119,6,0.1)] overflow-hidden ${isFeatured ? 'lg:col-span-2' : ''}`}
+                className={`group relative bg-slate-800/50 hover:bg-slate-800 backdrop-blur-md border border-slate-700/50 rounded-3xl p-8 transition-all duration-500 hover:-translate-y-1 overflow-hidden 
+                  ${isFeatured ? 'lg:col-span-2' : ''} 
+                  ${isPool 
+                    ? 'hover:border-blue-500/30 hover:shadow-[0_10px_40px_rgba(59,130,246,0.15)]' 
+                    : 'hover:border-amber-500/30 hover:shadow-[0_10px_40px_rgba(217,119,6,0.1)]'
+                  }`}
               >
                 {/* Subtle hover gradient background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-600/0 to-amber-600/0 group-hover:from-amber-600/5 group-hover:to-transparent transition-all duration-500 z-0"></div>
+                <div className={`absolute inset-0 bg-gradient-to-br transition-all duration-500 z-0
+                  ${isPool 
+                    ? 'from-blue-600/0 to-blue-600/0 group-hover:from-blue-600/5 group-hover:to-transparent' 
+                    : 'from-amber-600/0 to-amber-600/0 group-hover:from-amber-600/5 group-hover:to-transparent'
+                  }`}
+                ></div>
+                
+                {/* Coming Soon Badge for the Pool Card */}
+                {isPool && (
+                  <span className="absolute top-6 right-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow-[0_0_15px_rgba(37,99,235,0.4)] animate-pulse z-10">
+                    {t("coming_soon_badge")}
+                  </span>
+                )}
                 
                 <div className="relative z-10 h-full flex flex-col">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-900/80 border border-slate-700/50 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 group-hover:border-amber-500/50 transition-all duration-500">
+                  <div className={`w-16 h-16 rounded-2xl bg-slate-900/80 border flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-all duration-500
+                    ${isPool 
+                      ? 'border-blue-500/20 group-hover:border-blue-500/50' 
+                      : 'border-slate-700/50 group-hover:border-amber-500/50'
+                    }`}
+                  >
                     {featureIcons[idx]}
                   </div>
                   
@@ -84,7 +99,7 @@ export default function WhyUs() {
 
         {/* Bottom CTA */}
         <div className="mt-20 text-center">
-          <p className="text-slate-400 mb-8 italic">"{t("subtitle")}"</p>
+          <p className="text-slate-400 mb-8 italic">&quot;{t("subtitle")}&quot;</p>
           <a href="#reservation" className="inline-flex items-center px-8 py-4 rounded-full bg-transparent border-2 border-amber-600 text-amber-500 font-bold hover:bg-amber-600 hover:text-white transition-all duration-300 group shadow-[0_0_15px_rgba(217,119,6,0.1)] hover:shadow-[0_0_25px_rgba(217,119,6,0.4)]">
             Explore Activities
             <span className="ml-2 transform group-hover:translate-x-1 transition-transform rtl:rotate-180 rtl:group-hover:-translate-x-1">→</span>

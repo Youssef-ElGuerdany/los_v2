@@ -9,9 +9,17 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'ardkqvzacqrxyktthnky.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
       },
     ],
+  },
+  experimental: {
+    webpackMemoryOptimizations: true,
+    optimizePackageImports: ['lucide-react'],
   },
 };
 

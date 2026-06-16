@@ -12,7 +12,8 @@
     "title": "Bienvenue dans Notre Oasis du Désert",
     "subtitle": "Land of Sand and Adventures – L'ultime Resort de Quad, Buggy et Oasis dans les dunes de Agadir Takadt.",
     "book_now": "Réservez Votre Aventure",
-    "whatsapp": "Contact WhatsApp"
+    "whatsapp": "Contact WhatsApp",
+    "explore": "Explorer les Activités"
   },
   "Highlights": {
     "gopro_title": "Vidéo GoPro et Montage Pro Gratuits ! 🎥",
@@ -113,7 +114,7 @@
     "title": "Installations &",
     "title_highlight": "Commodités",
     "subtitle": "Notre camp de base haut de gamme offre tout ce dont vous avez besoin.",
-    "coming_soon": "Bientôt Disponible : Notre Piscine dans le Désert 🏊‍♂️",
+    "coming_soon_badge": "Bientôt Disponible",
     "values": [
       {
         "title": "Campement Saharien Spacieux",
@@ -138,6 +139,10 @@
       {
         "title": "Thé à la Menthe Gratuit & Info Tourisme",
         "desc": "Experts en tourisme sur place, plus du thé à la menthe traditionnel offert à chaque invité."
+      },
+      {
+        "title": "Piscine dans le Désert",
+        "desc": "Une piscine rafraîchissante dans le désert pour vous détendre après votre aventure dans les dunes."
       }
     ]
   },

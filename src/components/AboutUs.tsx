@@ -58,7 +58,7 @@ export default function AboutUs() {
 
                 {/* Bottom quote */}
                 <div className="absolute bottom-8 left-8 right-8 text-white/90 text-center">
-                  <p className="text-xl font-light italic tracking-wide">"More Than Just a Rental Shop."</p>
+                  <p className="text-xl font-light italic tracking-wide">&quot;More Than Just a Rental Shop.&quot;</p>
                 </div>
               </div>
             </div>

@@ -4,32 +4,49 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { X, ZoomIn } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+
+const defaultImages = [
+  { src: "images/DSC_5976.JPG", aspect: "aspect-[4/3]" },
+  { src: "images/DSC_6002.JPG", aspect: "aspect-[3/4]" },
+  { src: "images/DSC_6005.JPG", aspect: "aspect-square" },
+  { src: "images/DSC_6015.JPG", aspect: "aspect-[3/4]" },
+  { src: "images/DSC_6154.JPG", aspect: "aspect-[4/3]" },
+  { src: "images/DSC_6211.JPG", aspect: "aspect-square" },
+  { src: "images/DSC_6225.JPG", aspect: "aspect-[4/3]" },
+  { src: "images/DSC_6228.JPG", aspect: "aspect-[3/4]" },
+  { src: "images/DSC_6292.JPG", aspect: "aspect-[4/3]" },
+  { src: "images/DSC_6353.JPG", aspect: "aspect-square" },
+  { src: "images/DSC_6360.JPG", aspect: "aspect-[3/4]" },
+  { src: "images/DSC_6368.JPG", aspect: "aspect-[4/3]" },
+  { src: "images/DSC_6371.JPG", aspect: "aspect-square" },
+  { src: "images/DSC_6380.JPG", aspect: "aspect-[3/4]" },
+  { src: "images/DSC_6387.JPG", aspect: "aspect-[4/3]" },
+  { src: "images/DSC_6395.JPG", aspect: "aspect-[3/4]" },
+  { src: "images/IMG_20230611_002038.jpg", aspect: "aspect-square" },
+];
 
 export default function Gallery() {
   const t = useTranslations("Gallery");
+  const [images, setImages] = useState<Array<{ id?: string, src: string, aspect: string }>>(defaultImages);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  const images = [
-    { src: "/images/DSC_5976.JPG", aspect: "aspect-[4/3]" },
-    { src: "/images/DSC_6002.JPG", aspect: "aspect-[3/4]" },
-    { src: "/images/DSC_6005.JPG", aspect: "aspect-square" },
-    { src: "/images/DSC_6015.JPG", aspect: "aspect-[3/4]" },
-    { src: "/images/DSC_6154.JPG", aspect: "aspect-[4/3]" },
-    { src: "/images/DSC_6211.JPG", aspect: "aspect-square" },
-    { src: "/images/DSC_6225.JPG", aspect: "aspect-[4/3]" },
-    { src: "/images/DSC_6228.JPG", aspect: "aspect-[3/4]" },
-    { src: "/images/DSC_6292.JPG", aspect: "aspect-[4/3]" },
-    { src: "/images/DSC_6353.JPG", aspect: "aspect-square" },
-    { src: "/images/DSC_6360.JPG", aspect: "aspect-[3/4]" },
-    { src: "/images/DSC_6368.JPG", aspect: "aspect-[4/3]" },
-    { src: "/images/DSC_6371.JPG", aspect: "aspect-square" },
-    { src: "/images/DSC_6380.JPG", aspect: "aspect-[3/4]" },
-    { src: "/images/DSC_6387.JPG", aspect: "aspect-[4/3]" },
-    { src: "/images/DSC_6395.JPG", aspect: "aspect-[3/4]" },
-    { src: "/images/IMG_20230611_002038.jpg", aspect: "aspect-square" },
-  ];
+  useEffect(() => {
+    async function fetchGallery() {
+      if (!supabase) return;
+      const { data } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (data && data.length > 0) {
+        setImages(data);
+      }
+    }
+    fetchGallery();
+  }, []);
 
   // Prevent body scrolling when lightbox is open
   useEffect(() => {
@@ -47,7 +64,7 @@ export default function Gallery() {
     if (!container) return;
 
     let animationId: number;
-    let scrollAmount = 1;
+    const scrollAmount = 1;
 
     const scroll = () => {
       // Only auto-scroll on mobile views (< 768px) and when not hovering/touching
@@ -91,29 +108,33 @@ export default function Gallery() {
             ref={scrollRef}
             className="flex md:grid md:grid-cols-3 lg:grid-cols-4 gap-4 overflow-x-auto md:overflow-visible pb-8 md:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] scroll-smooth"
           >
-            {images.map((img, idx) => (
-              <div 
-                key={idx} 
-                className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto relative group overflow-hidden rounded-2xl cursor-pointer aspect-square md:${img.aspect} shadow-lg hover:shadow-2xl transition-all duration-500 animate-[fadeIn_0.6s_ease-out_both]`}
-                style={{ animationDelay: `${idx * 50}ms` }}
-                onClick={() => setSelectedImage(img.src)}
-              >
-                <Image 
-                  src={img.src} 
-                  alt={`Gallery image ${idx + 1}`} 
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110" 
-                />
-                
-                {/* Glassmorphism Hover Overlay */}
-                <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 backdrop-blur-[2px] transition-all duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="bg-white/20 backdrop-blur-md p-3 rounded-full border border-white/30 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 shadow-xl">
-                    <ZoomIn className="w-6 h-6 text-white" />
+            {images.map((img, idx) => {
+              const src = img.src.startsWith('http') || img.src.startsWith('/') ? img.src : `/${img.src}`;
+              return (
+                <div 
+                  key={img.id || idx} 
+                  className={`flex-shrink-0 w-[280px] sm:w-[320px] md:w-auto relative group overflow-hidden rounded-2xl cursor-pointer aspect-square md:${img.aspect || 'aspect-[4/3]'} shadow-lg hover:shadow-2xl transition-all duration-500 animate-[fadeIn_0.6s_ease-out_both]`}
+                  style={{ animationDelay: `${idx * 50}ms` }}
+                  onClick={() => setSelectedImage(src)}
+                >
+                  <Image 
+                    src={src} 
+                    alt={`Gallery image ${idx + 1}`} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    unoptimized={src.startsWith('http')}
+                    className="object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  
+                  {/* Glassmorphism Hover Overlay */}
+                  <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 backdrop-blur-[2px] transition-all duration-500 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="bg-white/20 backdrop-blur-md p-3 rounded-full border border-white/30 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-500 shadow-xl">
+                      <ZoomIn className="w-6 h-6 text-white" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -142,6 +163,7 @@ export default function Gallery() {
               alt="Enlarged gallery image"
               fill
               sizes="100vw"
+              unoptimized={selectedImage.startsWith('http')}
               className="object-contain animate-[fadeIn_0.5s_ease-out]"
             />
           </div>

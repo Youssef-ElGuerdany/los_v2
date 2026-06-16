@@ -1,8 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Star } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 // A simple Google G Logo SVG component
 const GoogleIcon = () => (
@@ -18,20 +19,70 @@ const GoogleIcon = () => (
 
 export default function Reviews() {
   const t = useTranslations("Reviews");
-  const reviewsData = t.raw("reviews") as Array<{name: string, date: string, text: string}>;
-  
-  // We duplicate the reviews array so the marquee seamlessly repeats
-  const duplicatedReviews = [...reviewsData, ...reviewsData];
-
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const locale = useLocale();
+  const [reviews, setReviews] = useState<{ name: string; date: string; text: string; rating?: number }[]>(() => {
+    try {
+      return t.raw("reviews") as Array<{name: string, date: string, text: string, rating?: number}>;
+    } catch {
+      return [];
+    }
+  });
   const [isHovered, setIsHovered] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadReviews() {
+      await Promise.resolve(); // Force execution to the next microtask to avoid react-hooks/set-state-in-effect warning
+      const staticReviews = t.raw("reviews") as Array<{name: string, date: string, text: string, rating?: number}>;
+
+      if (!supabase) {
+        if (active) setReviews(staticReviews);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("is_visible", true)
+          .order("created_at", { ascending: false });
+        
+        if (!active) return;
+
+        if (!error && data && data.length > 0) {
+          const mapped = data.map(item => ({
+            name: item.name,
+            date: item.date,
+            text: item[`text_${locale}`] || item.text,
+            rating: item.rating || 5
+          }));
+          setReviews(mapped);
+        } else {
+          setReviews(staticReviews);
+        }
+      } catch (err) {
+        console.error("Failed to load reviews from Supabase:", err);
+        if (active) {
+          setReviews(staticReviews);
+        }
+      }
+    }
+    loadReviews();
+    return () => {
+      active = false;
+    };
+  }, [locale, t]);
+
+  // We duplicate the reviews array so the marquee seamlessly repeats
+  const duplicatedReviews = [...reviews, ...reviews];
 
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
 
     let animationId: number;
-    let scrollAmount = 1;
+    const scrollAmount = 1;
 
     const scroll = () => {
       if (!isHovered) {
@@ -91,7 +142,7 @@ export default function Reviews() {
               >
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
+                    {[...Array(Math.max(1, Math.min(5, review.rating || 5)))].map((_, i) => (
                       <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500" />
                     ))}
                   </div>
@@ -99,7 +150,7 @@ export default function Reviews() {
                 </div>
                 
                 <p className="text-slate-700 dark:text-slate-300 text-base md:text-lg flex-grow mb-8 italic leading-relaxed whitespace-normal">
-                  "{review.text}"
+                  &quot;{review.text}&quot;
                 </p>
                 
                 <div className="flex items-center gap-4 mt-auto">

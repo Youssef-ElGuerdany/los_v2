@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { MessageCircle, X } from "lucide-react";
+import { useSettings } from "@/lib/settings";
 
 export default function FloatingWhatsApp() {
+  const settings = useSettings();
   const [isVisible, setIsVisible] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [closed, setClosed] = useState(false);
@@ -54,16 +56,16 @@ export default function FloatingWhatsApp() {
             <X className="w-4 h-4" />
           </button>
         </div>
-        <a href="https://wa.me/212661374773" target="_blank" rel="noopener noreferrer" className="block p-5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+        <a href={`https://wa.me/${settings.phone_number}`} target="_blank" rel="noopener noreferrer" className="block p-5 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
           <p className="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
-            👋 Hello! Planning an adventure in Agadir? Let's chat and build your perfect tour!
+            👋 Hello! Planning an adventure in Agadir? Let&apos;s chat and build your perfect tour!
           </p>
         </a>
       </div>
 
       {/* Main Button */}
       <a
-        href="https://wa.me/212661374773"
+        href={`https://wa.me/${settings.phone_number}`}
         target="_blank"
         rel="noopener noreferrer"
         className="relative flex items-center justify-center w-16 h-16 bg-green-500 text-white rounded-full shadow-[0_4px_20px_rgba(34,197,94,0.4)] hover:bg-green-600 transition-all duration-500 hover:scale-110 group"

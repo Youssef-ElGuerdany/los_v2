@@ -12,7 +12,8 @@
     "title": "Welcome to Our Desert Oasis",
     "subtitle": "Land of Sand and Adventures – The Ultimate Agadir Quad Biking, Buggy & Desert Oasis in Agadir Takadt.",
     "book_now": "Book Your Adventure",
-    "whatsapp": "Contact on WhatsApp"
+    "whatsapp": "Contact on WhatsApp",
+    "explore": "Explore Activities"
   },
   "Highlights": {
     "gopro_title": "Free GoPro Video & Professional Edit! 🎥",
@@ -137,9 +138,13 @@
       {
         "title": "Free Mint Tea & Tourist Info",
         "desc": "Local tourism experts on-site, plus free traditional Mint Tea for every guest."
+      },
+      {
+        "title": "Desert Swimming Pool",
+        "desc": "A refreshing desert swimming pool to cool off and relax after an epic ride through the dunes."
       }
     ],
-    "coming_soon": "Coming Soon: Our Desert Swimming Pool 🏊‍♂️"
+    "coming_soon_badge": "Coming Soon"
   },
   "Gallery": {
     "title": "Adventure",

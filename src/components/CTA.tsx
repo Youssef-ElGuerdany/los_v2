@@ -1,19 +1,24 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useSettings } from "@/lib/settings";
+import Image from "next/image";
 
 export default function CTA() {
   const t = useTranslations("CTA");
+  const settings = useSettings();
 
   return (
     <section className="relative py-32 overflow-hidden flex items-center justify-center">
       {/* Background Image & Overlay */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-slate-900/80 z-10"></div>
-        <img 
+        <Image 
           src="/images/cta.JPG" 
           alt="Desert sunset" 
-          className="w-full h-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
       </div>
 
@@ -29,7 +34,7 @@ export default function CTA() {
           <a href="#reservation" className="px-8 py-4 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(217,119,6,0.4)] text-lg">
             {t("book")}
           </a>
-          <a href="https://wa.me/212661374773" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold rounded-full transition-all transform hover:scale-105 text-lg">
+          <a href={`https://wa.me/${settings.phone_number}`} target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold rounded-full transition-all transform hover:scale-105 text-lg">
             {t("whatsapp")}
           </a>
         </div>

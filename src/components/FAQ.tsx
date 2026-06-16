@@ -1,12 +1,63 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function FAQ() {
   const t = useTranslations("FAQ");
+  const locale = useLocale();
+  const [faqs, setFaqs] = useState<{ q: string, a: string }[]>(() => {
+    try {
+      return t.raw("items") as Array<{q: string, a: string}>;
+    } catch {
+      return [];
+    }
+  });
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadFaqs() {
+      await Promise.resolve(); // Force execution to the next microtask to avoid react-hooks/set-state-in-effect warning
+      const staticFaqs = t.raw("items") as Array<{q: string, a: string}>;
+      
+      if (!supabase) {
+        if (active) setFaqs(staticFaqs);
+        return;
+      }
+      try {
+        const { data, error } = await supabase
+          .from("faqs")
+          .select("*")
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: true });
+
+        if (!active) return;
+
+        if (!error && data && data.length > 0) {
+          const mapped = data.map(item => ({
+            q: item[`q_${locale}`] || item.q,
+            a: item[`a_${locale}`] || item.a
+          }));
+          setFaqs(mapped);
+        } else {
+          setFaqs(staticFaqs);
+        }
+      } catch (err) {
+        console.error("Failed to load FAQs from Supabase:", err);
+        if (active) {
+          setFaqs(staticFaqs);
+        }
+      }
+    }
+    loadFaqs();
+    return () => {
+      active = false;
+    };
+  }, [locale, t]);
 
   const toggleAccordion = (index: number) => {
     if (openIndex === index) {
@@ -30,7 +81,7 @@ export default function FAQ() {
         </div>
 
         <div className="space-y-4">
-          {t.raw("items").map((item: { q: string, a: string }, idx: number) => {
+          {faqs.map((item: { q: string, a: string }, idx: number) => {
             const isOpen = openIndex === idx;
             return (
               <div 

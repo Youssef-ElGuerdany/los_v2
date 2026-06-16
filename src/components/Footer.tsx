@@ -1,9 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useSettings } from "@/lib/settings";
+import Image from "next/image";
 
 export default function Footer() {
   const currentYear = 2026; // As requested by user
+  const settings = useSettings();
 
   return (
     <footer className="bg-slate-950 py-12 border-t border-slate-800">
@@ -11,7 +13,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 w-full pt-8 mt-8">
           {/* Brand / Logo Area */}
           <div className="flex items-center gap-3 flex-1">
-            <img src="/logo.png" alt="Land of Sand Logo" className="h-10 w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            <Image src="/logo.png" alt="Land of Sand Logo" width={40} height={40} className="h-10 w-auto" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
             <span className="text-xl font-bold text-white tracking-wider">
               LAND OF SAND<span className="text-amber-500">.</span>
             </span>
@@ -27,7 +29,7 @@ export default function Footer() {
             <a href="https://www.instagram.com/quad_buggy_land_of_sand_agadir" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-amber-500 transition-colors font-medium">
               Instagram
             </a>
-            <a href="https://wa.me/212661374773" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-amber-500 transition-colors font-medium">
+            <a href={`https://wa.me/${settings.phone_number}`} target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-amber-500 transition-colors font-medium">
               WhatsApp
             </a>
           </div>

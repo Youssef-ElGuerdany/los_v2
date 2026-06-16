@@ -1,13 +1,16 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { useState } from "react";
-import { CheckCircle2, ShieldCheck, CreditCard, Car, Calendar, Users, Activity, Receipt } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShieldCheck, CreditCard, Car, Calendar, Users, Activity, Receipt } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useSettings } from "@/lib/settings";
 
 export default function ReservationForm() {
   const t = useTranslations("Reservation");
   const locale = useLocale();
   const currency = locale === "fr" ? "€" : "$";
+  const settings = useSettings();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -15,11 +18,127 @@ export default function ReservationForm() {
     activities: t("quad_tour"),
     persons: 2,
     numQuads: 1,
-    numBuggies: 1,
-    numCamel: 0,
-    numSandboard: 0
+    numBuggies: 1
   });
 
+  const [activitiesList, setActivitiesList] = useState<string[]>([
+    t("quad_tour"),
+    t("buggy_tour"),
+    t("quad_buggy_mix"),
+    t("moroccan_nights"),
+    t("overnight_stays"),
+    t("massa_offroad")
+  ]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [activitiesData, setActivitiesData] = useState<any[]>([]);
+
+  const getNumericPrice = (priceStr: string) => {
+    if (!priceStr) return 0;
+    const match = priceStr.match(/\d+/);
+    return match ? parseInt(match[0], 10) : 0;
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resolveActivityTitle = (act: any, activeLocale: string) => {
+    if (!act) return "";
+    return act[`title_${activeLocale}`] || act.title || "";
+  };
+
+  const getSelectedActivityType = (selectedTitle: string) => {
+    if (!selectedTitle) return "";
+    
+    // 1. Check virtual/mixed option
+    if (selectedTitle === t("quad_buggy_mix") || selectedTitle === "Quad & Buggy (Mixed)") {
+      return "quad_buggy_mix";
+    }
+
+    // 2. Find in activitiesData
+    const found = activitiesData.find(act => {
+      const titleInCurrentLocale = resolveActivityTitle(act, locale);
+      if (titleInCurrentLocale === selectedTitle) return true;
+      
+      // Fallback: check raw database columns (across all locales)
+      const locales = ["en", "fr", "es", "de"];
+      if (act.title === selectedTitle) return true;
+      for (const loc of locales) {
+        if (act[`title_${loc}`] === selectedTitle) return true;
+      }
+      return false;
+    });
+
+    if (found) {
+      if (found.static_id === "tour1") return "quad_tour";
+      if (found.static_id === "tour2") return "buggy_tour";
+      return found.static_id || found.id;
+    }
+
+    // 3. Fallback to locale translations
+    if (selectedTitle === t("quad_tour") || selectedTitle === "Quad Tour") return "quad_tour";
+    if (selectedTitle === t("buggy_tour") || selectedTitle === "Buggy Tour") return "buggy_tour";
+    if (selectedTitle === t("moroccan_nights") || selectedTitle === "Moroccan Nights & Gnawa Dinners") return "tour3";
+    if (selectedTitle === t("overnight_stays") || selectedTitle === "Overnight Stays (Families-Only)" || selectedTitle === "Overnight Stays") return "tour4";
+    if (selectedTitle === t("massa_offroad") || selectedTitle === "Full Day Excursion Takadt to Massa") return "tour5";
+
+    return "";
+  };
+
+  const currentActType = getSelectedActivityType(formData.activities);
+
+  useEffect(() => {
+    async function loadActivities() {
+      if (!supabase) return;
+      const { data } = await supabase
+        .from('activities')
+        .select('*')
+        .order('is_static', { ascending: false })
+        .order('created_at', { ascending: true });
+
+      if (data && data.length > 0) {
+        setActivitiesData(data);
+        const resolvedList: string[] = [];
+
+        // 1. Quad Tour
+        const qd = data.find(d => d.static_id === "tour1");
+        resolvedList.push(resolveActivityTitle(qd, locale));
+
+        // 2. Buggy Tour
+        const bg = data.find(d => d.static_id === "tour2");
+        resolvedList.push(resolveActivityTitle(bg, locale));
+
+        // 3. Quad & Buggy (Mixed)
+        resolvedList.push(t("quad_buggy_mix"));
+
+        // 4. Moroccan Nights
+        const mn = data.find(d => d.static_id === "tour3");
+        resolvedList.push(resolveActivityTitle(mn, locale));
+
+        // 5. Overnight Stays
+        const os = data.find(d => d.static_id === "tour4");
+        resolvedList.push(resolveActivityTitle(os, locale));
+
+        // 6. Massa Offroad
+        const mo = data.find(d => d.static_id === "tour5");
+        resolvedList.push(resolveActivityTitle(mo, locale));
+
+        // 7. Custom dynamic activities
+        const custom = data.filter(d => !d.static_id);
+        custom.forEach(c => {
+          resolvedList.push(resolveActivityTitle(c, locale));
+        });
+
+        setActivitiesList(resolvedList);
+
+        // Sync default selected activity name from database resolved title
+        const defaultActivity = resolveActivityTitle(qd, locale);
+        setFormData(prev => ({ ...prev, activities: defaultActivity }));
+      }
+    }
+    loadActivities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, t]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateData = (key: string, value: any) => {
     setFormData(prev => {
       const next = { ...prev, [key]: value };
@@ -28,36 +147,35 @@ export default function ReservationForm() {
       if (next.numQuads < 1) next.numQuads = 1;
       if (next.numBuggies < 1) next.numBuggies = 1;
       if (next.persons < 1) next.persons = 1;
-      if (next.numCamel < 0) next.numCamel = 0;
-      if (next.numSandboard < 0) next.numSandboard = 0;
       
       // Smart Auto-Adjust based on what the user changed
+      const actType = getSelectedActivityType(next.activities);
       if (
-        next.activities === t("quad_tour") || 
-        next.activities === t("buggy_tour") || 
-        next.activities === t("quad_buggy_mix")
+        actType === "quad_tour" || 
+        actType === "buggy_tour" || 
+        actType === "quad_buggy_mix"
       ) {
         
         // 1. If user changed PERSONS
         if (key === "persons" || key === "activities") {
           // Auto-add vehicles if they exceed capacity
-          if (next.activities === t("quad_tour") && next.persons > next.numQuads * 2) {
+          if (actType === "quad_tour" && next.persons > next.numQuads * 2) {
              next.numQuads = Math.ceil(next.persons / 2);
-          } else if (next.activities === t("buggy_tour") && next.persons > next.numBuggies * 2) {
+          } else if (actType === "buggy_tour" && next.persons > next.numBuggies * 2) {
              next.numBuggies = Math.ceil(next.persons / 2);
-          } else if (next.activities === t("quad_buggy_mix")) {
-             let capacity = (next.numQuads * 2) + (next.numBuggies * 2);
+          } else if (actType === "quad_buggy_mix") {
+             const capacity = (next.numQuads * 2) + (next.numBuggies * 2);
              if (next.persons > capacity) {
-                next.numQuads += Math.ceil((next.persons - capacity) / 2);
+                 next.numQuads += Math.ceil((next.persons - capacity) / 2);
              }
           }
           
           // Reduce vehicles if vehicles exceed people
-          if (next.activities === t("quad_tour") && next.persons < next.numQuads) {
+          if (actType === "quad_tour" && next.persons < next.numQuads) {
              next.numQuads = next.persons;
-          } else if (next.activities === t("buggy_tour") && next.persons < next.numBuggies) {
+          } else if (actType === "buggy_tour" && next.persons < next.numBuggies) {
              next.numBuggies = next.persons;
-          } else if (next.activities === t("quad_buggy_mix") && next.persons < next.numQuads + next.numBuggies) {
+          } else if (actType === "quad_buggy_mix" && next.persons < next.numQuads + next.numBuggies) {
              let excess = (next.numQuads + next.numBuggies) - next.persons;
              if (next.numQuads >= excess) next.numQuads -= excess;
              else {
@@ -66,8 +184,8 @@ export default function ReservationForm() {
                next.numBuggies -= excess;
              }
              if (next.numQuads === 0 && next.numBuggies > 0 && next.persons > 1) {
-                next.numQuads = 1;
-                next.numBuggies = Math.max(1, next.persons - 1);
+                 next.numQuads = 1;
+                 next.numBuggies = Math.max(1, next.persons - 1);
              }
           }
         }
@@ -75,20 +193,20 @@ export default function ReservationForm() {
         // 2. If user changed VEHICLES (numQuads or numBuggies)
         if (key === "numQuads" || key === "numBuggies") {
            // Auto-add persons if vehicles exceed persons (you need at least 1 driver per vehicle)
-           if (next.activities === t("quad_tour") && next.numQuads > next.persons) {
+           if (actType === "quad_tour" && next.numQuads > next.persons) {
               next.persons = next.numQuads;
-           } else if (next.activities === t("buggy_tour") && next.numBuggies > next.persons) {
+           } else if (actType === "buggy_tour" && next.numBuggies > next.persons) {
               next.persons = next.numBuggies;
-           } else if (next.activities === t("quad_buggy_mix") && (next.numQuads + next.numBuggies) > next.persons) {
+           } else if (actType === "quad_buggy_mix" && (next.numQuads + next.numBuggies) > next.persons) {
               next.persons = next.numQuads + next.numBuggies;
            }
            
            // Auto-reduce persons if they exceed total capacity of new vehicle selection
-           if (next.activities === t("quad_tour") && next.numQuads * 2 < next.persons) {
+           if (actType === "quad_tour" && next.numQuads * 2 < next.persons) {
               next.persons = next.numQuads * 2;
-           } else if (next.activities === t("buggy_tour") && next.numBuggies * 2 < next.persons) {
+           } else if (actType === "buggy_tour" && next.numBuggies * 2 < next.persons) {
               next.persons = next.numBuggies * 2;
-           } else if (next.activities === t("quad_buggy_mix") && (next.numQuads * 2 + next.numBuggies * 2) < next.persons) {
+           } else if (actType === "quad_buggy_mix" && (next.numQuads * 2 + next.numBuggies * 2) < next.persons) {
               next.persons = (next.numQuads * 2) + (next.numBuggies * 2);
            }
         }
@@ -98,61 +216,81 @@ export default function ReservationForm() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check for add-ons
-    let addonsText = "";
-    if (formData.numCamel > 0 || formData.numSandboard > 0) {
-      const selectedAddons = [];
-      if (formData.numCamel > 0) selectedAddons.push(`${formData.numCamel}x ${t("addon_camel")}`);
-      if (formData.numSandboard > 0) selectedAddons.push(`${formData.numSandboard}x ${t("addon_sandboard")}`);
-      addonsText = `\n*Add-ons:* ${selectedAddons.join(", ")}`;
-    }
+    const actType = getSelectedActivityType(formData.activities);
 
     // Check for vehicle counts
     let vehiclesText = "";
-    if (formData.activities === t("quad_tour")) {
+    if (actType === "quad_tour") {
       vehiclesText = `\n*${t("quads_count")}:* ${formData.numQuads}`;
-    } else if (formData.activities === t("buggy_tour")) {
+    } else if (actType === "buggy_tour") {
       vehiclesText = `\n*${t("buggies_count")}:* ${formData.numBuggies}`;
-    } else if (formData.activities === t("quad_buggy_mix")) {
+    } else if (actType === "quad_buggy_mix") {
       vehiclesText = `\n*${t("quads_count")}:* ${formData.numQuads}\n*${t("buggies_count")}:* ${formData.numBuggies}`;
     }
 
     // Calculate total amount for the WhatsApp message
     let total = 0;
-    if (formData.activities === t("quad_tour")) {
-      total += formData.numQuads * 25;
-    } else if (formData.activities === t("buggy_tour")) {
-      total += formData.numBuggies * 50;
-    } else if (formData.activities === t("quad_buggy_mix")) {
-      total += (formData.numQuads * 25) + (formData.numBuggies * 50);
-    }
+
+    const quadActivity = activitiesData.find(d => d.static_id === "tour1");
+    const buggyActivity = activitiesData.find(d => d.static_id === "tour2");
     
-    if (formData.activities === t("quad_tour") || formData.activities === t("buggy_tour") || formData.activities === t("quad_buggy_mix")) {
-      total += formData.numCamel * 5;
-      total += formData.numSandboard * 4;
+    const quadPrice = quadActivity ? getNumericPrice(quadActivity.price) : 25;
+    const buggyPrice = buggyActivity ? getNumericPrice(buggyActivity.price) : 50;
+
+    if (actType === "quad_tour") {
+      total += formData.numQuads * quadPrice;
+    } else if (actType === "buggy_tour") {
+      total += formData.numBuggies * buggyPrice;
+    } else if (actType === "quad_buggy_mix") {
+      total += (formData.numQuads * quadPrice) + (formData.numBuggies * buggyPrice);
+    } else {
+      // Find selected activity in state
+      const selectedDbActivity = activitiesData.find(act => {
+        const actTitle = act[`title_${locale}`] || act.title;
+        return actTitle === formData.activities;
+      });
+      if (selectedDbActivity) {
+        const basePrice = getNumericPrice(selectedDbActivity.price);
+        total += basePrice * formData.persons;
+      }
     }
 
     const totalStr = total > 0 ? `\n\n*Total Amount:* ${locale === 'fr' ? total + currency : currency + total} (Pay on Arrival)` : "";
 
+    // Save reservation log to Supabase
+    if (supabase) {
+      try {
+        const hasQuad = actType === "quad_tour" || actType === "quad_buggy_mix";
+        const hasBuggy = actType === "buggy_tour" || actType === "quad_buggy_mix";
+        
+        await supabase.from("reservations").insert([
+          {
+            name: formData.name,
+            date: formData.date,
+            activity: formData.activities,
+            persons: formData.persons,
+            num_quads: hasQuad ? formData.numQuads : 0,
+            num_buggies: hasBuggy ? formData.numBuggies : 0,
+            total_price: total > 0 ? (locale === 'fr' ? `${total}${currency}` : `${currency}${total}`) : "Free / Inquiry",
+            status: "pending"
+          }
+        ]);
+      } catch (err) {
+        console.error("Failed to store reservation log in Supabase:", err);
+      }
+    }
+
     // Format WhatsApp message
-    const message = `Hello Land of Sand! I would like to book an adventure:\n\n*Name:* ${formData.name}\n*Date:* ${formData.date}\n*Activity:* ${formData.activities}${vehiclesText}\n*Number of People:* ${formData.persons}${addonsText}${totalStr}\n\nPlease let me know the availability!`;
+    const message = `Hello Land of Sand! I would like to book an adventure:\n\n*Name:* ${formData.name}\n*Date:* ${formData.date}\n*Activity:* ${formData.activities}${vehiclesText}\n*Number of People:* ${formData.persons}${totalStr}\n\nPlease let me know the availability!`;
     
     // Redirect to WhatsApp safely (avoids popup blockers)
-    window.location.href = `https://wa.me/212661374773?text=${encodeURIComponent(message)}`;
+    window.location.href = `https://wa.me/${settings.phone_number}?text=${encodeURIComponent(message)}`;
   };
 
-  // The actual localized values from our JSON files
-  const activitiesList = [
-    t("quad_tour"),
-    t("buggy_tour"),
-    t("quad_buggy_mix"),
-    t("moroccan_nights"),
-    t("overnight_stays"),
-    t("massa_offroad")
-  ];
+  // Activities list is dynamically loaded via useEffect
 
   return (
     <section id="reservation" className="py-24 bg-slate-900 transition-colors relative overflow-hidden">
@@ -231,7 +369,7 @@ export default function ReservationForm() {
 
             <div className="grid grid-cols-2 gap-4">
               {/* Conditional Quad Counter */}
-              {(formData.activities === t("quad_tour") || formData.activities === t("quad_buggy_mix")) && (
+              {(currentActType === "quad_tour" || currentActType === "quad_buggy_mix") && (
                 <div className="space-y-2 col-span-2 sm:col-span-1">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("num_quads")}</label>
                   <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900 overflow-hidden h-12">
@@ -243,7 +381,7 @@ export default function ReservationForm() {
               )}
 
               {/* Conditional Buggy Counter */}
-              {(formData.activities === t("buggy_tour") || formData.activities === t("quad_buggy_mix")) && (
+              {(currentActType === "buggy_tour" || currentActType === "quad_buggy_mix") && (
                 <div className="space-y-2 col-span-2 sm:col-span-1">
                   <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t("num_buggies")}</label>
                   <div className="flex items-center border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-900 overflow-hidden h-12">
@@ -255,38 +393,7 @@ export default function ReservationForm() {
               )}
             </div>
 
-            {/* Conditional Add-ons if Quad or Buggy is selected */}
-            {(formData.activities === t("quad_tour") || formData.activities === t("buggy_tour") || formData.activities === t("quad_buggy_mix")) && (
-              <div className="space-y-4 p-5 bg-slate-100 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 block mb-2">{t("addons_label")}</label>
-                
-                {/* Camel Addon Counter */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-900 dark:text-white">{t("addon_camel")}</p>
-                    <p className="text-sm text-slate-500">5{currency} / person</p>
-                  </div>
-                  <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 overflow-hidden shadow-sm h-10">
-                    <button type="button" onClick={() => updateData("numCamel", formData.numCamel - 1)} className="w-10 h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold transition-colors">-</button>
-                    <div className="w-10 text-center font-semibold text-slate-900 dark:text-white">{formData.numCamel}</div>
-                    <button type="button" onClick={() => updateData("numCamel", formData.numCamel + 1)} className="w-10 h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold transition-colors">+</button>
-                  </div>
-                </div>
 
-                {/* Sandboard Addon Counter */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-900 dark:text-white">{t("addon_sandboard")}</p>
-                    <p className="text-sm text-slate-500">4{currency} / person</p>
-                  </div>
-                  <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 overflow-hidden shadow-sm h-10">
-                    <button type="button" onClick={() => updateData("numSandboard", formData.numSandboard - 1)} className="w-10 h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold transition-colors">-</button>
-                    <div className="w-10 text-center font-semibold text-slate-900 dark:text-white">{formData.numSandboard}</div>
-                    <button type="button" onClick={() => updateData("numSandboard", formData.numSandboard + 1)} className="w-10 h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-900 dark:text-white font-bold transition-colors">+</button>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2"><Users className="w-4 h-4 text-amber-500"/> {t("persons")}</label>
@@ -300,13 +407,29 @@ export default function ReservationForm() {
             {/* Total Amount Display */}
             {(() => {
               let total = 0;
-              if (formData.activities === t("quad_tour")) total += formData.numQuads * 25;
-              else if (formData.activities === t("buggy_tour")) total += formData.numBuggies * 50;
-              else if (formData.activities === t("quad_buggy_mix")) total += (formData.numQuads * 25) + (formData.numBuggies * 50);
+
+              const quadActivity = activitiesData.find(d => d.static_id === "tour1");
+              const buggyActivity = activitiesData.find(d => d.static_id === "tour2");
               
-              if (formData.activities === t("quad_tour") || formData.activities === t("buggy_tour") || formData.activities === t("quad_buggy_mix")) {
-                total += formData.numCamel * 5;
-                total += formData.numSandboard * 4;
+              const quadPrice = quadActivity ? getNumericPrice(quadActivity.price) : 25;
+              const buggyPrice = buggyActivity ? getNumericPrice(buggyActivity.price) : 50;
+
+              if (currentActType === "quad_tour") {
+                total += formData.numQuads * quadPrice;
+              } else if (currentActType === "buggy_tour") {
+                total += formData.numBuggies * buggyPrice;
+              } else if (currentActType === "quad_buggy_mix") {
+                total += (formData.numQuads * quadPrice) + (formData.numBuggies * buggyPrice);
+              } else {
+                // Find selected activity in state
+                const selectedDbActivity = activitiesData.find(act => {
+                  const actTitle = act[`title_${locale}`] || act.title;
+                  return actTitle === formData.activities;
+                });
+                if (selectedDbActivity) {
+                  const basePrice = getNumericPrice(selectedDbActivity.price);
+                  total += basePrice * formData.persons;
+                }
               }
 
               if (total > 0) {

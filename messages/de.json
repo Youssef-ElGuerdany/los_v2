@@ -12,7 +12,8 @@
     "title": "Willkommen in Unserer Wüstenoase",
     "subtitle": "Land of Sand and Adventures – Das ultimative Quad, Buggy & Oasen Resort in den Dünen von Agadir Takadt.",
     "book_now": "Abenteuer Buchen",
-    "whatsapp": "WhatsApp Kontakt"
+    "whatsapp": "WhatsApp Kontakt",
+    "explore": "Aktivitäten Entdecken"
   },
   "Highlights": {
     "gopro_title": "Kostenloses GoPro Video & Bearbeitung! 🎥",
@@ -113,7 +114,7 @@
     "title": "Basis",
     "title_highlight": "Einrichtungen",
     "subtitle": "Unser Premium-Basislager bietet alles, was Sie brauchen.",
-    "coming_soon": "Demnächst: Unser Wüstenpool 🏊‍♂️",
+    "coming_soon_badge": "Demnächst",
     "values": [
       {
         "title": "Geräumiges Sahara Camp",
@@ -138,6 +139,10 @@
       {
         "title": "Kostenloser Minztee",
         "desc": "Gratis traditioneller Minztee für jeden Gast."
+      },
+      {
+        "title": "Wüsten-Swimmingpool",
+        "desc": "Ein erfrischender Wüsten-Swimmingpool zum Entspannen nach Ihrem Abenteuer in den Dünen."
       }
     ]
   },

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Phone, Mail, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { useSettings } from "@/lib/settings";
 
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
@@ -14,6 +15,7 @@ const InstagramIcon = () => (
 
 export default function Contact() {
   const t = useTranslations("Contact");
+  const settings = useSettings();
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -44,7 +46,7 @@ export default function Contact() {
         setStatus("error");
         setTimeout(() => setStatus("idle"), 5000);
       }
-    } catch (error) {
+    } catch {
       setStatus("error");
       setTimeout(() => setStatus("idle"), 5000);
     }
@@ -81,13 +83,13 @@ export default function Contact() {
               <div className="space-y-6">
                 
                 {/* WhatsApp */}
-                <a href="https://wa.me/212661374773" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
+                <a href={`https://wa.me/${settings.phone_number}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
                   <div className="w-14 h-14 rounded-full bg-green-500/10 dark:bg-green-500/20 flex items-center justify-center text-green-600 dark:text-green-500 group-hover:scale-110 group-hover:bg-green-500 group-hover:text-white transition-all duration-300 shadow-sm border border-green-500/20">
                     <Phone className="w-6 h-6" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">WhatsApp / Phone</p>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-green-500 transition-colors">+212 661-374773</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-green-500 transition-colors">+{settings.phone_number}</p>
                   </div>
                 </a>
 
